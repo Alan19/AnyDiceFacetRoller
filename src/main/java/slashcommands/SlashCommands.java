@@ -35,6 +35,21 @@ public class SlashCommands {
         return builder.createForServer(getServer(api));
     }
 
+    public static CompletableFuture<ApplicationCommand> registerRollCommand(DiscordApi api) {
+        List<ApplicationCommandOption> options = new ArrayList<>();
+        options.add(ApplicationCommandOption.create(ApplicationCommandOptionType.STRING, "dicepool", "The dice pool to roll with.", true));
+        options.add(ApplicationCommandOption.create(ApplicationCommandOptionType.INTEGER, "discount", "The number of plot points to discount (negative results in a plot point cost increase).", false));
+        options.add(ApplicationCommandOption.create(ApplicationCommandOptionType.INTEGER, "dicekept", "The number of dice kept. Keeps two dice by default.", false));
+        options.add(ApplicationCommandOption.create(ApplicationCommandOptionType.BOOLEAN, "enhanceable", "Allows the roll to be enhanced after the roll.", false));
+        options.add(ApplicationCommandOption.create(ApplicationCommandOptionType.BOOLEAN, "opportunity", "Allows for opportunities on the roll. Defaults to true.", false));
+
+        final ApplicationCommandBuilder builder = new ApplicationCommandBuilder()
+                .setName("roll")
+                .setDescription("Rolls some dice!")
+                .setOptions(options);
+        return builder.createForServer(getServer(api));
+    }
+
     public static CompletableFuture<ApplicationCommand> registerPlotPointCommand(DiscordApi api) {
         final List<ApplicationCommandOption> applicationCommandOptions = new ArrayList<>();
         final ApplicationCommandOptionBuilder[] applicationCommandOptionBuilders = {getMentionableOption(), getPlotPointCountOption()};

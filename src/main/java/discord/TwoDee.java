@@ -51,6 +51,7 @@ public class TwoDee {
                 SlashCommands.registerDoomCommand(api).join();
                 SlashCommands.registerBleedCommand(api).join();
                 SlashCommands.registerPlotPointCommand(api).join();
+                SlashCommands.registerRollCommand(api).join();
                 //Create listeners
                 api.addListener(new PlotPointEnhancementListener());
                 api.addListener(new SlashCommandListener());
