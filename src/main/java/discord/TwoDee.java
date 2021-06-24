@@ -1,10 +1,14 @@
 package discord;
 
+import commander.CommandSpecBuilder;
+import commander.Commander;
 import commands.*;
 import de.btobastian.sdcf4j.CommandHandler;
 import de.btobastian.sdcf4j.handler.JavacordHandler;
 import listeners.DeleteStatsListener;
 import listeners.PlotPointEnhancementListener;
+import logic.SnackLogic;
+import logic.StopLogic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApiBuilder;
@@ -30,41 +34,49 @@ public class TwoDee {
             Properties prop = new Properties();
             prop.load(new FileInputStream("resources/bot.properties"));
             String token = prop.getProperty("token");
-            new DiscordApiBuilder().setToken(token).setAllIntentsExcept(Intent.GUILD_PRESENCES).login().thenAccept(api -> {
-                //Send startup messsage
-                new MessageBuilder()
-                        .setContent(getStartupMessage())
-                        .send(api.getTextChannelById("484544303247523840").get());
-                // Print the invite url of your bot
-                LOGGER.info(String.format("You can invite the bot by using the following url: %s", api.createBotInvite()));
-                //Create command handler
-                CommandHandler cmdHandler = new JavacordHandler(api);
-                cmdHandler.registerCommand(new StatisticsCommand());
-                cmdHandler.registerCommand(new RollCommand());
-                cmdHandler.registerCommand(new TestRollCommand());
-                cmdHandler.registerCommand(new StopCommand());
-                cmdHandler.registerCommand(new HelpCommand(cmdHandler));
-                cmdHandler.registerCommand(new PlotPointCommand());
-                cmdHandler.registerCommand(new EmojiPurgeCommand());
-                cmdHandler.registerCommand(new EnhancementToggleCommand());
-                cmdHandler.registerCommand(new ReplenishCommand());
-                SlashCommands.registerDoomCommand(api).join();
-                SlashCommands.registerBleedCommand(api).join();
-                SlashCommands.registerPlotPointCommand(api).join();
-                SlashCommands.registerRollCommand(api).join();
-                //Create listeners
-                api.addListener(new PlotPointEnhancementListener());
-                api.addListener(new SlashCommandListener());
-                DeleteStatsListener deleteStatsListener = new DeleteStatsListener(api);
-                deleteStatsListener.startListening();
+            String channel = prop.getProperty("channel", "484544303247523840");
+            new DiscordApiBuilder()
+                    .setToken(token)
+                    .setAllIntentsExcept(Intent.GUILD_PRESENCES)
+                    .login()
+                    .thenAccept(api -> {
+                        //Send startup messsage
+                        new MessageBuilder()
+                                .setContent(getStartupMessage())
+                                .send(api.getTextChannelById(channel)
+                                        .orElseThrow(() -> new IllegalStateException("Failed to find Channel for Id: " + channel))
+                                );
 
-            })
+                        // Print the invite url of your bot
+                        LOGGER.info(String.format("You can invite the bot by using the following url: %s", api.createBotInvite()));
+                        //Create command handler
+                        CommandHandler cmdHandler = new JavacordHandler(api);
+                        cmdHandler.registerCommand(new StatisticsCommand());
+                        cmdHandler.registerCommand(new RollCommand());
+                        cmdHandler.registerCommand(new TestRollCommand());
+                        cmdHandler.registerCommand(new HelpCommand(cmdHandler));
+                        cmdHandler.registerCommand(new PlotPointCommand());
+                        cmdHandler.registerCommand(new EmojiPurgeCommand());
+                        cmdHandler.registerCommand(new EnhancementToggleCommand());
+                        cmdHandler.registerCommand(new ReplenishCommand());
+
+                        Commander commander = new Commander(api, "~",
+                                StopLogic.getSpec(),
+                                SnackLogic.getSpec()
+                        );
+                        commander.register();
+
+                        //Create listeners
+                        api.addListener(new PlotPointEnhancementListener());
+                        api.addListener(new SlashCommandListener());
+                        DeleteStatsListener deleteStatsListener = new DeleteStatsListener(api);
+                        deleteStatsListener.startListening();
+                    })
                     // Log any exceptions that happened
                     .exceptionally(ExceptionLogger.get());
-        } catch (IOException e) {
+        } catch (Throwable e) {
             LOGGER.error("Failed to start TwoDee", e);
         }
-
     }
 
     //Returns a random dice roll line
