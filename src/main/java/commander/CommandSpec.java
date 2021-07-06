@@ -13,13 +13,15 @@ public class CommandSpec {
     private final String description;
     private final String usage;
     private final Map<String, CommandSpec> children;
+    private final CommandParameter[] parameters;
     private final Function<CommandContext, Optional<CommandResponse>> handler;
 
-    public CommandSpec(String name, String[] alias, String description, String usage, CommandSpec[] children, Function<CommandContext, Optional<CommandResponse>> handler) {
+    public CommandSpec(String name, String[] alias, String description, String usage, CommandSpec[] children, CommandParameter[] parameters, Function<CommandContext, Optional<CommandResponse>> handler) {
         this.name = name;
         this.alias = alias;
         this.description = description;
         this.usage = usage;
+        this.parameters = parameters;
         this.children = Maps.newLinkedHashMap();
         for (CommandSpec child : children) {
             this.children.put(child.getName(), child);
@@ -28,6 +30,10 @@ public class CommandSpec {
             }
         }
         this.handler = handler;
+    }
+
+    public CommandParameter[] getParameters() {
+        return parameters;
     }
 
     public String getName() {

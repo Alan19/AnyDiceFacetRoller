@@ -1,9 +1,11 @@
 package commander;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CommandSpecBuilder {
     private final String name;
@@ -11,6 +13,7 @@ public class CommandSpecBuilder {
     private String description;
     private String usage;
     private CommandSpec[] children;
+    private CommandParameterBuilder[] parameters;
     private Function<CommandContext, Optional<CommandResponse>> handler;
 
     public CommandSpecBuilder(String name) {
@@ -33,12 +36,27 @@ public class CommandSpecBuilder {
     }
 
     public CommandSpecBuilder withChildren(CommandSpec... children) {
-        for (CommandSpec child : children) {
-            if (!child.getChildren().isEmpty()) {
-                throw new IllegalArgumentException("Cannot add Children that have Children");
+        if (parameters.length == 0) {
+            for (CommandSpec child : children) {
+                if (!child.getChildren().isEmpty()) {
+                    throw new IllegalArgumentException("Cannot add Children that have Children");
+                }
             }
+            this.children = children;
         }
-        this.children = children;
+        else {
+            throw new UnsupportedOperationException("Commands with parameters cannot have children");
+        }
+        return this;
+    }
+
+    public CommandSpecBuilder withParameters(CommandParameterBuilder... parameters) {
+        if (children.length == 0) {
+            this.parameters = parameters;
+        }
+        else {
+            throw new UnsupportedOperationException("Commands with children cannot have parameters");
+        }
         return this;
     }
 
@@ -62,6 +80,7 @@ public class CommandSpecBuilder {
                 Objects.requireNonNull(description),
                 Objects.requireNonNull(usage),
                 children == null ? new CommandSpec[0] : children,
+                parameters == null ? new CommandParameter[0] : Arrays.stream(parameters).map(CommandParameterBuilder::build).collect(Collectors.toList()).toArray(new CommandParameter[]{}),
                 children == null ? Objects.requireNonNull(handler, "Must have Children or Handler") : handler
         );
     }
