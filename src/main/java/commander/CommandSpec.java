@@ -1,11 +1,13 @@
 package commander;
 
 import com.google.common.collect.Maps;
+import org.javacord.api.interaction.ApplicationCommandOption;
+import org.javacord.api.interaction.ApplicationCommandOptionBuilder;
+import org.javacord.api.interaction.ApplicationCommandOptionType;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CommandSpec {
     private final String name;
@@ -62,5 +64,21 @@ public class CommandSpec {
 
     public CommandSpec getChild(String name) {
         return children.get(name);
+    }
+
+    public List<ApplicationCommandOption> getOptions() {
+        if (!children.isEmpty()) {
+            return children.entrySet().stream().map(stringCommandSpecEntry -> new ApplicationCommandOptionBuilder()
+                    .setName(stringCommandSpecEntry.getKey())
+                    .setDescription("a subcommand for " + getName())
+                    .setType(ApplicationCommandOptionType.SUB_COMMAND_GROUP)
+                    .setRequired(true)
+                    .setOptions(stringCommandSpecEntry.getValue().getOptions()).build()).collect(Collectors.toList());
+        }
+        else if (parameters.length != 0) {
+            return Arrays.stream(parameters).map(CommandParameter::generateOption).collect(Collectors.toList());
+        }
+        else
+            return new ArrayList<>();
     }
 }

@@ -1,12 +1,12 @@
 package discord;
 
-import commander.CommandSpecBuilder;
 import commander.Commander;
 import commands.*;
 import de.btobastian.sdcf4j.CommandHandler;
 import de.btobastian.sdcf4j.handler.JavacordHandler;
 import listeners.DeleteStatsListener;
 import listeners.PlotPointEnhancementListener;
+import logic.BleedLogic;
 import logic.SnackLogic;
 import logic.StopLogic;
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +16,6 @@ import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.util.logging.ExceptionLogger;
 import slashcommands.SlashCommandListener;
-import slashcommands.SlashCommands;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -62,7 +61,8 @@ public class TwoDee {
 
                         Commander commander = new Commander(api, "~",
                                 StopLogic.getSpec(),
-                                SnackLogic.getSpec()
+                                SnackLogic.getSpec(),
+                                BleedLogic.getSpec()
                         );
                         commander.register();
 

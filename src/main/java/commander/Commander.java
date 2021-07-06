@@ -44,6 +44,7 @@ public class Commander implements MessageCreateListener, InteractionCreateListen
                         .map(value -> new ApplicationCommandBuilder()
                                 .setName(value.getName())
                                 .setDescription(value.getDescription())
+                                .setOptions(value.getOptions())
                                 .createForServer(server)
                         )
                         .toArray(CompletableFuture[]::new)

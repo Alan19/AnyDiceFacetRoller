@@ -50,7 +50,7 @@ public class CommandSpecBuilder {
     }
 
     public CommandSpecBuilder withParameters(CommandParameterBuilder... parameters) {
-        if (children.length == 0) {
+        if (children == null || children.length == 0) {
             this.parameters = parameters;
         }
         else {

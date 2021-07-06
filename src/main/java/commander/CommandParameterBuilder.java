@@ -16,11 +16,6 @@ public class CommandParameterBuilder {
         this.name = name;
     }
 
-    public CommandParameterBuilder isRequired(boolean required) {
-        this.required = required;
-        return this;
-    }
-
     public CommandParameterBuilder withDescription(String description) {
         this.description = description;
         return this;
@@ -53,5 +48,9 @@ public class CommandParameterBuilder {
                 matchingRegex == null ? "" : matchingRegex,
                 required,
                 choices == null ? new String[0] : choices);
+    }
+
+    public static CommandParameterBuilder of(String name) {
+        return new CommandParameterBuilder(Objects.requireNonNull(name));
     }
 }
