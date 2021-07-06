@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class CommandSpecBuilder {
     private final String name;
@@ -80,7 +79,7 @@ public class CommandSpecBuilder {
                 Objects.requireNonNull(description),
                 Objects.requireNonNull(usage),
                 children == null ? new CommandSpec[0] : children,
-                parameters == null ? new CommandParameter[0] : Arrays.stream(parameters).map(CommandParameterBuilder::build).collect(Collectors.toList()).toArray(new CommandParameter[]{}),
+                parameters == null ? new CommandParameter[0] : Arrays.stream(parameters).map(CommandParameterBuilder::build).toArray(CommandParameter[]::new),
                 children == null ? Objects.requireNonNull(handler, "Must have Children or Handler") : handler
         );
     }
