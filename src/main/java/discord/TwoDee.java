@@ -15,7 +15,6 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.util.logging.ExceptionLogger;
-import slashcommands.SlashCommandListener;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -68,7 +67,6 @@ public class TwoDee {
 
                         //Create listeners
                         api.addListener(new PlotPointEnhancementListener());
-                        api.addListener(new SlashCommandListener());
                         DeleteStatsListener deleteStatsListener = new DeleteStatsListener(api);
                         deleteStatsListener.startListening();
                     })

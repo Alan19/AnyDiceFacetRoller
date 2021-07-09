@@ -1,9 +1,9 @@
 package commander;
 
 import com.google.common.collect.Maps;
-import org.javacord.api.interaction.ApplicationCommandOption;
-import org.javacord.api.interaction.ApplicationCommandOptionBuilder;
-import org.javacord.api.interaction.ApplicationCommandOptionType;
+import org.javacord.api.interaction.SlashCommandOption;
+import org.javacord.api.interaction.SlashCommandOptionBuilder;
+import org.javacord.api.interaction.SlashCommandOptionType;
 
 import java.util.*;
 import java.util.function.Function;
@@ -18,6 +18,7 @@ public class CommandSpec {
     private final CommandParameter[] parameters;
     private final Function<CommandContext, Optional<CommandResponse>> handler;
 
+    // TODO Add way to determine if command should respond immediately or later
     public CommandSpec(String name, String[] alias, String description, String usage, CommandSpec[] children, CommandParameter[] parameters, Function<CommandContext, Optional<CommandResponse>> handler) {
         this.name = name;
         this.alias = alias;
@@ -66,12 +67,12 @@ public class CommandSpec {
         return children.get(name);
     }
 
-    public List<ApplicationCommandOption> getOptions() {
+    public List<SlashCommandOption> getOptions() {
         if (!children.isEmpty()) {
-            return children.entrySet().stream().map(stringCommandSpecEntry -> new ApplicationCommandOptionBuilder()
+            return children.entrySet().stream().map(stringCommandSpecEntry -> new SlashCommandOptionBuilder()
                     .setName(stringCommandSpecEntry.getKey())
                     .setDescription("a subcommand for " + getName())
-                    .setType(ApplicationCommandOptionType.SUB_COMMAND_GROUP)
+                    .setType(SlashCommandOptionType.SUB_COMMAND_GROUP)
                     .setRequired(true)
                     .setOptions(stringCommandSpecEntry.getValue().getOptions()).build()).collect(Collectors.toList());
         }

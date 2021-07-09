@@ -8,8 +8,8 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
-import org.javacord.api.interaction.ApplicationCommandInteraction;
-import org.javacord.api.interaction.ApplicationCommandInteractionOption;
+import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.listener.interaction.InteractionCreateListener;
 import sheets.PlotPointHandler;
 import sheets.SheetsHandler;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class SlashCommandListener implements InteractionCreateListener {
-    private void handleBleedCommand(ApplicationCommandInteraction applicationCommand) {
+    private void handleBleedCommand(SlashCommandInteraction applicationCommand) {
         final Optional<Mentionable> targets = applicationCommand.getOptionMentionableValueByName("targets");
         List<User> mentionedUsers = targets.map(this::getMentionedUsers).orElseGet(ArrayList::new);
         List<Triple<User, Integer, Integer>> plotPointChanges = new ArrayList<>();
@@ -87,9 +87,9 @@ public class SlashCommandListener implements InteractionCreateListener {
     }
 
 
-    private void handleDoomCommand(ApplicationCommandInteraction applicationCommand) {
-        applicationCommand.getOptionByName("mode").map(ApplicationCommandInteractionOption::getOptions).ifPresent(applicationCommandInteractionOptions -> {
-            final ApplicationCommandInteractionOption modeOption = applicationCommandInteractionOptions.get(0);
+    private void handleDoomCommand(SlashCommandInteraction applicationCommand) {
+        applicationCommand.getOptionByName("mode").map(SlashCommandInteractionOption::getOptions).ifPresent(applicationCommandInteractionOptions -> {
+            final SlashCommandInteractionOption modeOption = applicationCommandInteractionOptions.get(0);
             final Optional<String> poolName = modeOption.getOptionStringValueByName("name");
             final Optional<Integer> count = modeOption.getOptionIntValueByName("count");
             // TODO Add error messages instead of using orElse
@@ -125,7 +125,7 @@ public class SlashCommandListener implements InteractionCreateListener {
 
     @Override
     public void onInteractionCreate(InteractionCreateEvent event) {
-        event.getApplicationCommandInteraction().ifPresent(applicationCommand -> {
+        event.getSlashCommandInteraction().ifPresent(applicationCommand -> {
             switch (applicationCommand.getCommandName()) {
                 case "doom":
                     handleDoomCommand(applicationCommand);

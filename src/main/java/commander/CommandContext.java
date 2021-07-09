@@ -6,13 +6,17 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.interaction.SlashCommandInteractionOption;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CommandContext {
     private final DiscordApi api;
     private final Message message;
     private final User user;
+    private final List<SlashCommandInteractionOption> options;
     private final MessageAuthor author;
     private final TextChannel channel;
     private final Server server;
@@ -24,15 +28,21 @@ public class CommandContext {
         this.author = message.getAuthor();
         this.channel = message.getChannel();
         this.server = message.getServer().orElse(null);
+        this.options = new ArrayList<>();
     }
 
-    public CommandContext(DiscordApi api, Message message, User user, TextChannel channel, Server server) {
+    public CommandContext(DiscordApi api, Message message, User user, TextChannel channel, Server server, List<SlashCommandInteractionOption> options) {
         this.api = api;
         this.message = message;
         this.user = user;
+        this.options = options;
         this.author = null;
         this.channel = channel;
         this.server = server;
+    }
+
+    public List<SlashCommandInteractionOption> getOptions() {
+        return options;
     }
 
     public Optional<Message> getMessage() {

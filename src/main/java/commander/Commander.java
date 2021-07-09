@@ -5,8 +5,8 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.server.ServerJoinEvent;
-import org.javacord.api.interaction.ApplicationCommandBuilder;
-import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
+import org.javacord.api.interaction.SlashCommandBuilder;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import org.javacord.api.listener.interaction.InteractionCreateListener;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.listener.server.ServerJoinListener;
@@ -41,7 +41,7 @@ public class Commander implements MessageCreateListener, InteractionCreateListen
         this.api.getServers()
                 .forEach(server -> CompletableFuture.allOf(this.commandSpecs.values()
                         .parallelStream()
-                        .map(value -> new ApplicationCommandBuilder()
+                        .map(value -> new SlashCommandBuilder()
                                 .setName(value.getName())
                                 .setDescription(value.getDescription())
                                 .setOptions(value.getOptions())
@@ -72,22 +72,22 @@ public class Commander implements MessageCreateListener, InteractionCreateListen
 
     @Override
     public void onInteractionCreate(InteractionCreateEvent event) {
-        event.getApplicationCommandInteraction()
+        event.getSlashCommandInteraction()
                 .ifPresent(interaction -> {
                     CommandSpec commandSpec = commandSpecs.get(interaction.getCommandName());
                     if (commandSpec != null) {
-                        InteractionImmediateResponseBuilder responseBuilder = interaction.createImmediateResponder();
+                        CompletableFuture<InteractionOriginalResponseUpdater> responseBuilder = interaction.respondLater();
                         commandSpec.getHandler()
                                 .apply(new CommandContext(
                                         api,
                                         null,
                                         event.getInteraction().getUser(),
                                         interaction.getChannel().orElse(null),
-                                        interaction.getServer().orElse(null)
+                                        interaction.getServer().orElse(null),
+                                        interaction.getOptions()
                                 ))
                                 .orElseGet(() -> CommandResponse.of("Acknowledged"))
-                                .handle(responseBuilder::setContent, responseBuilder::addEmbed);
-                        responseBuilder.respond();
+                                .handle(responseBuilder);
                     }
                 });
     }
@@ -96,7 +96,7 @@ public class Commander implements MessageCreateListener, InteractionCreateListen
     public void onServerJoin(ServerJoinEvent event) {
         CompletableFuture.allOf(this.commandSpecs.values()
                 .parallelStream()
-                .map(value -> new ApplicationCommandBuilder()
+                .map(value -> new SlashCommandBuilder()
                         .setName(value.getName())
                         .setDescription(value.getDescription())
                         .createForServer(event.getServer())

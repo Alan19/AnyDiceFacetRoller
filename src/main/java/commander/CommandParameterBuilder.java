@@ -1,13 +1,14 @@
 package commander;
 
-import org.javacord.api.interaction.ApplicationCommandOptionType;
+
+import org.javacord.api.interaction.SlashCommandOptionType;
 
 import java.util.Objects;
 
 public class CommandParameterBuilder {
     private String name;
     private String description;
-    private ApplicationCommandOptionType type;
+    private SlashCommandOptionType type;
     private String matchingRegex;
     private boolean required;
     private String[] choices;
@@ -21,7 +22,7 @@ public class CommandParameterBuilder {
         return this;
     }
 
-    public CommandParameterBuilder withType(ApplicationCommandOptionType type) {
+    public CommandParameterBuilder withType(SlashCommandOptionType type) {
         this.type = type;
         return this;
     }
