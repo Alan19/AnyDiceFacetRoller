@@ -11,12 +11,16 @@ import org.javacord.api.listener.interaction.InteractionCreateListener;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.listener.server.ServerJoinListener;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Stores all of the command specs and the handlers for handling slash and text commands. Registers the slash commands.
+ */
 public class Commander implements MessageCreateListener, InteractionCreateListener, ServerJoinListener {
     private final Pattern commandPattern;
     private final DiscordApi api;
@@ -52,15 +56,27 @@ public class Commander implements MessageCreateListener, InteractionCreateListen
 
     }
 
+    /**
+     * Handles a text command by matching the command and then matching the parameters. Then creates a context with the
+     * message and the options and handles it.
+     *
+     * @param event The MessageCreateEvent
+     */
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
+        // TODO Properly compile parameters
         Matcher matcher = commandPattern.matcher(event.getMessageContent());
         if (matcher.matches()) {
             String command = matcher.group("command");
             CommandSpec commandSpec = commandSpecs.get(command);
             if (commandSpec != null) {
+                Map<String, String> options = new HashMap<>();
+                for (CommandParameter commandParameter : commandSpec.getParameters()) {
+                    Pattern optionPattern = Pattern.compile(commandParameter.getMatchingRegex());
+                    options.put(commandParameter.getDescription(), optionPattern.matcher(event.getMessageContent()).group());
+                }
                 commandSpec.getHandler()
-                        .apply(new CommandContext(api, event.getMessage()))
+                        .apply(new CommandContext(api, event.getMessage(), options))
                         .ifPresent(commandResponse -> {
                             MessageBuilder messageBuilder = new MessageBuilder();
                             commandResponse.handle(messageBuilder::setContent, messageBuilder::setEmbed);

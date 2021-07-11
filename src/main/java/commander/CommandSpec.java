@@ -9,6 +9,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Stores information about the structure of the command, such as the parameters that works for both text and slash commands
+ */
 public class CommandSpec {
     private final String name;
     private final String[] alias;

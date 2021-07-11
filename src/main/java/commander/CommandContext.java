@@ -8,41 +8,49 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Stores information that would allow a command class to handle the incoming command
+ * <p>
+ * Includes information about the slash command options, text command options, and various information about the message
+ */
 public class CommandContext {
     private final DiscordApi api;
     private final Message message;
     private final User user;
-    private final List<SlashCommandInteractionOption> options;
+    private final List<SlashCommandInteractionOption> slashCommandOptions;
+    private final Map<String, String> textOptions;
     private final MessageAuthor author;
     private final TextChannel channel;
     private final Server server;
 
-    public CommandContext(DiscordApi api, Message message) {
+    public CommandContext(DiscordApi api, Message message, Map<String, String> options) {
         this.api = api;
         this.message = message;
         this.user = message.getUserAuthor().orElse(null);
         this.author = message.getAuthor();
         this.channel = message.getChannel();
         this.server = message.getServer().orElse(null);
-        this.options = new ArrayList<>();
+        this.slashCommandOptions = null;
+        this.textOptions = options;
     }
 
-    public CommandContext(DiscordApi api, Message message, User user, TextChannel channel, Server server, List<SlashCommandInteractionOption> options) {
+    public CommandContext(DiscordApi api, Message message, User user, TextChannel channel, Server server, List<SlashCommandInteractionOption> slashCommandOptions) {
         this.api = api;
         this.message = message;
         this.user = user;
-        this.options = options;
+        this.slashCommandOptions = slashCommandOptions;
         this.author = null;
         this.channel = channel;
         this.server = server;
+        this.textOptions = null;
     }
 
-    public List<SlashCommandInteractionOption> getOptions() {
-        return options;
+    public List<SlashCommandInteractionOption> getSlashCommandOptions() {
+        return slashCommandOptions;
     }
 
     public Optional<Message> getMessage() {
@@ -67,6 +75,10 @@ public class CommandContext {
 
     public DiscordApi getApi() {
         return api;
+    }
+
+    public Optional<Map<String, String>> getTextOptions() {
+        return Optional.ofNullable(textOptions);
     }
 
     public Optional<String> getDisplayName() {

@@ -69,11 +69,11 @@ public class BleedLogic {
 
 
     public static Optional<CommandResponse> handle(CommandContext context) {
-        Optional<Mentionable> target = context.getOptions().stream()
+        Optional<Mentionable> target = context.getSlashCommandOptions().stream()
                 .filter(applicationCommandInteractionOption -> applicationCommandInteractionOption.getName().equals("targets"))
                 .findFirst()
                 .flatMap(SlashCommandInteractionOption::getMentionableValue);
-        Optional<Integer> modifier = context.getOptions().stream()
+        Optional<Integer> modifier = context.getSlashCommandOptions().stream()
                 .filter(applicationCommandInteractionOption -> applicationCommandInteractionOption.getName().equals("modifier"))
                 .findFirst()
                 .flatMap(SlashCommandInteractionOption::getIntValue);

@@ -26,6 +26,30 @@ public class CommandParameter {
         this.choices = choices;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public SlashCommandOptionType getType() {
+        return type;
+    }
+
+    public String getMatchingRegex() {
+        return matchingRegex;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public String[] getChoices() {
+        return choices;
+    }
+
     public SlashCommandOption generateOption() {
         return new SlashCommandOptionBuilder()
                 .setName(name)
